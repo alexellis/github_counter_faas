@@ -37,7 +37,7 @@ $ docker stack deploy func --compose-file=./docker-compose.yml
 
 Head over to Github settings for your repository and enter your URL into a new Webhook. Select only specific events, then "watchers".
 
-Your URL will be something like:
+You can now either set up a NAT/port forwarding rule on your home router or run [ngrok](http://ngrok.com/download) to create a quick tunnel and expose your FaaS API gateway on the internet. Your URL will be something like:
 
 ```
 http://ngrok.io/function/func_github_event_relay
