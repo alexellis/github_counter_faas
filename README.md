@@ -1,9 +1,22 @@
 # github_counter_faas
-Integrate a Github counter with FaaS and Raspberry Pi (ARM)
+
+This is a sample stack of functions for FaaS to track the count of stars added to a Github repository over time.
+
+It shows how:
+
+* that FaaS works well on a Raspberry Pi or 32-bit ARM architecture
+* to integrate with Github webhooks
+* how to use a Raspberry Pi LED matrix to show data from the built-in Prometheus metrics
+* how to build functions for the Raspberry Pi
+
+In the photo you can see two LEDs lit up which means that two stars were added to the repository on Github over the last 30 minutes. As more stars are added the matrix will fill up. The page in the background is showing the webhook event that Github sent to the FaaS API Gateway through the `github_event_relay` function.
 
 ![](https://pbs.twimg.com/media/C8MdRlpXYAEUYIT.jpg)
 
 [Find out more about the FaaS framework for Docker](https://github.com/alexellis/faas)
+
+
+### Setting up the demo:
 
 Pre-reqs:
 
