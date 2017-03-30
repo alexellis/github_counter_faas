@@ -1,12 +1,17 @@
 # github_counter_faas
 Integrate a Github counter with FaaS and Raspberry Pi (ARM)
 
+![](https://pbs.twimg.com/media/C8MdRlpXYAEUYIT.jpg)
+
+[Find out more about the FaaS framework for Docker](https://github.com/alexellis/faas)
+
 Pre-reqs:
 
-* Docker
-* i2c should be enabled for the scroll-phat
+* Raspbian Lite and a Raspberry Pi
+* Docker 1.13+
+* For a physical display - enabled i2c and connect a Pimoroni scroll-phat
 
-Clone this repository
+**Clone this repository**
 
 ```
 $ git clone https://github.com/alexellis/github_counter_faas
@@ -14,17 +19,21 @@ $ git clone https://github.com/alexellis/github_counter_faas
 $ cd github_counter_faas
 ```
 
-Initialize Docker swarm:
+**Initialize Docker swarm:**
 
 ```
 $ docker swarm init
 ```
 
-Deploy the FaaS stack:
+> Tutorial: [Build an RPi swarm](http://blog.alexellis.io/live-deep-dive-pi-swarm/)
+
+**Deploy the FaaS stack:**
 
 ```
 $ docker stack deploy func --compose-file=./docker-compose.yml
 ```
+
+> Tutorial: [Learn about Docker Stacks](http://blog.alexellis.io/docker-stacks-attachable-networks/)
 
 Head over to Github settings for your repository and enter your URL into a new Webhook. Select only specific events, then "watchers".
 
