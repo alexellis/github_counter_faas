@@ -1,0 +1,67 @@
+version: "3"
+services:
+
+# Core API services are pinned, HA is provided for functions.
+    gateway:
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock"
+        ports:
+            - 8383:8080
+        image: functions/gateway:latest-armhf
+        networks:
+            - functions
+        deploy:
+            placement:
+                constraints: [node.role == manager]
+
+    prometheus:
+        image: alexellis2/prometheus-armhf:1.5.2
+        volumes:
+            - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+            - ./prometheus/alert.rules:/etc/prometheus/alert.rules
+
+        command: "-config.file=/etc/prometheus/prometheus.yml -storage.local.path=/prometheus -storage.local.memory-chunks=10000 --alertmanager.url=http://alertmanager:9093"
+        ports:
+            - 9090:9090
+        depends_on:
+            - gateway
+            - alertmanager
+        environment:
+            no_proxy:   "gateway"
+        networks:
+            - functions
+        deploy:
+            placement:
+                constraints: [node.role == manager]
+
+    github_event_relay:
+        image: github_event_relay
+        networks:
+          - functions
+        labels:
+          function: "true"
+        depends_on:
+          - gateway
+        deploy:
+            placement:
+                constraints: [node.role == manager]
+
+    star:
+        image: functions/alpine:latest-armhf
+        environment:
+          fprocess: "/bin/cat"
+        networks:
+          - functions
+        labels:
+          function: "true"
+        depends_on:
+          - gateway
+        deploy:
+            placement:
+                constraints: [node.role == manager]
+
+networks:
+    functions:
+        driver: overlay
+        # Docker does not support this option yet - maybe create outside of the stack and reference as "external"?
+        #attachable: true
