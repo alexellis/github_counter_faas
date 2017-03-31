@@ -2,10 +2,10 @@
 
 This is a sample stack of functions for FaaS to track the count of stars added to a Github repository over time.
 
-It shows how:
+It shows:
 
-* that FaaS works well on a Raspberry Pi or 32-bit ARM architecture
-* to integrate with Github webhooks
+* that [FaaS](https://github.com/alexellis/faas) works well on a Raspberry Pi or 32-bit ARM architecture
+* how to integrate with Github webhooks via the FaaS API Gateway
 * how to use a Raspberry Pi LED matrix to show data from the built-in Prometheus metrics
 * how to build functions for the Raspberry Pi
 
@@ -42,11 +42,19 @@ $ docker swarm init
 
 **Deploy the FaaS stack:**
 
+The docker-compose.yml file defines all the long-running services and functions in the stack.
+
+* [docker-compose.yml](https://github.com/alexellis/github_counter_faas/blob/master/docker-compose.yml)
+
+Deploy the stack like this:
+
 ```
 $ docker stack deploy func --compose-file=./docker-compose.yml
 ```
 
 > Tutorial: [Learn about Docker Stacks](http://blog.alexellis.io/docker-stacks-attachable-networks/)
+
+If you have several Raspberry Pis in a Docker Swarm then FaaS can automatically spread your functions across the hosts.
 
 Head over to Github settings for your repository and enter your URL into a new Webhook. Select only specific events, then "watchers".
 
@@ -56,18 +64,28 @@ You can now either set up a NAT/port forwarding rule on your home router or run 
 http://ngrok.io/function/func_github_event_relay
 ```
 
-The gateway deployed on port 8383 will show the total invocation count for func_stars, to see the stars over the last 30 minutes type in this PromQL:
+### Visualising the data captured
+
+* Method 1 - view the FaaS Portal UI
+
+The gateway is deployed on port 8383 on the IP address of the Raspberry Pi. Go to that URL in a web-browser and you will see all the functions listed on the left hand side. Click a function to see its `invocation count` - the count refers to the amount of times Github has called this endpoint.
+
+* Method 2 - view the data in the Prometheus UI
+
+Prometheus is deployed on port 9090. Load the web-age and view the increase in star events via the `func_stars` function. This query shows the increase over the last 30 minutes (in PromQL):
 
 ```
 increase(gateway_function_invocation_total{code="200",function_name="func_star",instance="gateway:8080",job="gateway"}[30m])
 ```
 
-(Optional display unit)
+* Method 3 - built-in Pimoroni scroll-phat display (pictured)
 
-Now build and run the scroll-phat display unit if you have one attached:
+If you have connected a scroll-phat from Pimoroni then you can build and run the following code to start a container that monitors the Prometheus query above and displays the total as a number of pixels.
 
 ```
 $ cd prometheus_scroll
-$ docker build -t prometheus_scroll .; docker rm -f scroll ;docker run --name scroll --privileged --restart=always -d prometheus_scroll
+$ docker build -t prometheus_scroll .
+$ docker rm -f scroll
+$ docker run --name scroll --privileged --restart=always -d prometheus_scroll
 ```
 
